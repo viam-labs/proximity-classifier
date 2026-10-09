@@ -1,0 +1,23 @@
+{
+  "$schema": "https://dl.viam.dev/module.schema.json",
+  "module_id": "viam-labs:proximity-classifier",
+  "visibility": "public",
+  "url": "https://github.com/viam-labs/proximity-classifier",
+  "description": "Vision service that classifies a camera point cloud by whether points sit near configured locations.",
+  "markdown_link": "README.md",
+  "entrypoint": "run.sh",
+  "first_run": "setup.sh",
+  "models": [
+    {
+      "api": "rdk:service:vision",
+      "model": "viam-labs:vision:proximity-classifier",
+      "markdown_link": "README.md#configuration",
+      "short_description": "Classifies a point cloud when points fall near configured coordinates."
+    }
+  ],
+  "build": {
+    "build": "./build.sh",
+    "path": "dist/archive.tar.gz",
+    "arch": ["linux/amd64", "linux/arm64", "darwin/arm64"]
+  }
+}
