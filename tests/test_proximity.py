@@ -43,7 +43,9 @@ def classifier(classes: dict | None = None, radius: float = 0.5) -> ProximityCla
     service.view = "yz"
     if classes is None:
         classes = {"left-cup": LEFT, "right-cup": RIGHT}
-    service.classes = {name: (point["x"], point["y"], point["z"]) for name, point in classes.items()}
+    service.classes = {
+        name: (point["x"], point["y"], point["z"]) for name, point in classes.items()
+    }
     service.deps = {Camera.get_resource_name("cup-camera"): CloudCamera(cups_bytes())}
     return service
 
@@ -57,9 +59,9 @@ def test_both_cups_classify():
 
 def test_empty_space_is_not_a_cup():
     found = asyncio.run(
-        classifier({"left-cup": LEFT, "right-cup": RIGHT, "nowhere": {"x": 0, "y": 0, "z": 20}}).get_classifications_from_camera(
-            "cup-camera", 5
-        )
+        classifier(
+            {"left-cup": LEFT, "right-cup": RIGHT, "nowhere": {"x": 0, "y": 0, "z": 20}}
+        ).get_classifications_from_camera("cup-camera", 5)
     )
     assert "nowhere" not in {item.class_name for item in found}
 
@@ -83,8 +85,12 @@ def test_grid_without_classes():
 def test_side_view_puts_the_short_cup_on_the_left():
     points = parse_pcd(cups_bytes())
     layout = layout_for(points, "yz")
-    short_x, short_y = world_to_pixel(layout, np.array([LEFT["x"], LEFT["y"], LEFT["z"]]))
-    tall_x, tall_y = world_to_pixel(layout, np.array([RIGHT["x"], RIGHT["y"], RIGHT["z"]]))
+    short_x, short_y = world_to_pixel(
+        layout, np.array([LEFT["x"], LEFT["y"], LEFT["z"]])
+    )
+    tall_x, tall_y = world_to_pixel(
+        layout, np.array([RIGHT["x"], RIGHT["y"], RIGHT["z"]])
+    )
     assert short_x < tall_x
     assert short_y > tall_y
 
@@ -93,7 +99,11 @@ def test_camera_is_required():
     with pytest.raises(ValidationError):
         ProximityClassifier.validate(ComponentConfig(attributes=dict_to_struct({})))
     required, optional = ProximityClassifier.validate(
-        ComponentConfig(attributes=dict_to_struct({"camera": "cup-camera", "classes": {"left-cup": LEFT}}))
+        ComponentConfig(
+            attributes=dict_to_struct(
+                {"camera": "cup-camera", "classes": {"left-cup": LEFT}}
+            )
+        )
     )
     assert required == ["cup-camera"]
     assert optional == []

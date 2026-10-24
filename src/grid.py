@@ -88,7 +88,11 @@ def layout_for(points: np.ndarray, view: str) -> Layout:
 def world_to_pixel(layout: Layout, point: np.ndarray) -> tuple[int, int]:
     h = float(point[AXIS[layout.horizontal]])
     v = float(point[AXIS[layout.vertical]])
-    dx = (layout.max_h - h) * layout.scale if layout.positive_left else (h - layout.min_h) * layout.scale
+    dx = (
+        (layout.max_h - h) * layout.scale
+        if layout.positive_left
+        else (h - layout.min_h) * layout.scale
+    )
     dy = (layout.max_v - v) * layout.scale
     return layout.origin_x + int(round(dx)), layout.origin_y + int(round(dy))
 
@@ -122,7 +126,12 @@ def render_grid(
                 draw.point((x + 1, y), fill=color)
                 draw.point((x, y + 1), fill=color)
     else:
-        draw.text((layout.origin_x, HEIGHT // 2), "no points in the cloud", fill=(80, 80, 80), font=font)
+        draw.text(
+            (layout.origin_x, HEIGHT // 2),
+            "no points in the cloud",
+            fill=(80, 80, 80),
+            font=font,
+        )
 
     for name, (x, y, z) in classes.items():
         px, py = world_to_pixel(layout, np.array([x, y, z], dtype=np.float64))
@@ -135,7 +144,9 @@ def render_grid(
     return out.getvalue()
 
 
-def _draw_grid(draw: ImageDraw.ImageDraw, font: ImageFont.ImageFont, layout: Layout) -> None:
+def _draw_grid(
+    draw: ImageDraw.ImageDraw, font: ImageFont.ImageFont, layout: Layout
+) -> None:
     step_h = _nice_step(layout.max_h - layout.min_h)
     step_v = _nice_step(layout.max_v - layout.min_v)
     h = math.ceil(layout.min_h / step_h) * step_h
@@ -143,7 +154,9 @@ def _draw_grid(draw: ImageDraw.ImageDraw, font: ImageFont.ImageFont, layout: Lay
         x, y_top = world_to_pixel(layout, _on_axes(layout, h, layout.max_v))
         _, y_bot = world_to_pixel(layout, _on_axes(layout, h, layout.min_v))
         draw.line((x, y_top, x, y_bot), fill=(210, 210, 210))
-        draw.text((x - 10, y_bot + 2), _format_tick(h, step_h), fill=(60, 60, 60), font=font)
+        draw.text(
+            (x - 10, y_bot + 2), _format_tick(h, step_h), fill=(60, 60, 60), font=font
+        )
         h += step_h
     v = math.ceil(layout.min_v / step_v) * step_v
     while v <= layout.max_v + step_v * 0.01:
@@ -161,7 +174,9 @@ def _on_axes(layout: Layout, horizontal: float, vertical: float) -> np.ndarray:
     return point
 
 
-def _draw_color_bar(draw: ImageDraw.ImageDraw, font: ImageFont.ImageFont, layout: Layout) -> None:
+def _draw_color_bar(
+    draw: ImageDraw.ImageDraw, font: ImageFont.ImageFont, layout: Layout
+) -> None:
     x0 = WIDTH - 58
     y0 = layout.origin_y
     height = HEIGHT - 36 - 40
@@ -170,8 +185,15 @@ def _draw_color_bar(draw: ImageDraw.ImageDraw, font: ImageFont.ImageFont, layout
         draw.line((x0, y0 + i, x0 + 14, y0 + i), fill=_color_for(t))
     step = _nice_step(layout.max_c - layout.min_c)
     draw.text((x0 - 4, y0 - 14), layout.color_axis.upper(), fill=(0, 0, 0), font=font)
-    draw.text((x0 + 18, y0), _format_tick(layout.max_c, step), fill=(0, 0, 0), font=font)
-    draw.text((x0 + 18, y0 + height - 12), _format_tick(layout.min_c, step), fill=(0, 0, 0), font=font)
+    draw.text(
+        (x0 + 18, y0), _format_tick(layout.max_c, step), fill=(0, 0, 0), font=font
+    )
+    draw.text(
+        (x0 + 18, y0 + height - 12),
+        _format_tick(layout.min_c, step),
+        fill=(0, 0, 0),
+        font=font,
+    )
 
 
 def _color_for(t: float) -> tuple[int, int, int]:

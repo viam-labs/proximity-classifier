@@ -31,7 +31,9 @@ class ProximityClassifier(Vision):
     cloud even when no classes are configured, which is how you read off coordinates.
     """
 
-    MODEL: ClassVar[Model] = Model(ModelFamily("viam-labs", "vision"), "proximity-classifier")
+    MODEL: ClassVar[Model] = Model(
+        ModelFamily("viam-labs", "vision"), "proximity-classifier"
+    )
 
     def __init__(self, name: str):
         super().__init__(name)
@@ -43,7 +45,9 @@ class ProximityClassifier(Vision):
         self.deps: Mapping[ResourceName, ResourceBase] = {}
 
     @classmethod
-    def new(cls, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]) -> Self:
+    def new(
+        cls, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]
+    ) -> Self:
         classifier = cls(config.name)
         classifier.reconfigure(config, dependencies)
         return classifier
@@ -66,7 +70,9 @@ class ProximityClassifier(Vision):
             raise ValidationError("view must be yz, xz, or xy")
         return [camera], []
 
-    def reconfigure(self, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]):
+    def reconfigure(
+        self, config: ComponentConfig, dependencies: Mapping[ResourceName, ResourceBase]
+    ):
         attrs = struct_to_dict(config.attributes)
         camera = str(attrs.get("camera") or "")
         if Camera.get_resource_name(camera) not in dependencies:
@@ -100,7 +106,9 @@ class ProximityClassifier(Vision):
         extra: Optional[Mapping[str, ValueTypes]] = None,
         timeout: Optional[float] = None,
     ) -> list[Classification]:
-        raise NotSupportedError(f"proximity classifier reads a point cloud from camera {self.camera_name!r}")
+        raise NotSupportedError(
+            f"proximity classifier reads a point cloud from camera {self.camera_name!r}"
+        )
 
     async def get_detections_from_camera(
         self,
@@ -171,13 +179,17 @@ class ProximityClassifier(Vision):
 
     def _check_camera(self, camera_name: str) -> None:
         if camera_name and camera_name != self.camera_name:
-            raise ValidationError(f"proximity classifier reads camera {self.camera_name!r}, not {camera_name!r}")
+            raise ValidationError(
+                f"proximity classifier reads camera {self.camera_name!r}, not {camera_name!r}"
+            )
 
     async def _points(self) -> np.ndarray:
         camera = self.deps[Camera.get_resource_name(self.camera_name)]
         data, _mime = await camera.get_point_cloud()
         if not data:
-            raise ValidationError(f"camera {self.camera_name!r} returned no point cloud")
+            raise ValidationError(
+                f"camera {self.camera_name!r} returned no point cloud"
+            )
         return parse_pcd(data)
 
     def _classify(self, points: np.ndarray) -> list[Classification]:
@@ -187,7 +199,9 @@ class ProximityClassifier(Vision):
         radius2 = self.radius * self.radius
         for name, center in self.classes.items():
             delta = points - np.asarray(center, dtype=np.float64)
-            count = int(np.count_nonzero(np.einsum("ij,ij->i", delta, delta) <= radius2))
+            count = int(
+                np.count_nonzero(np.einsum("ij,ij->i", delta, delta) <= radius2)
+            )
             if count < self.min_points:
                 continue
             confidence = min(1.0, count / (self.min_points * 10))
@@ -202,7 +216,11 @@ def _parse_classes(raw) -> dict[str, tuple[float, float, float]]:
         if not name:
             raise ValidationError("a class name is empty")
         try:
-            classes[str(name)] = (float(point["x"]), float(point["y"]), float(point["z"]))
+            classes[str(name)] = (
+                float(point["x"]),
+                float(point["y"]),
+                float(point["z"]),
+            )
         except (KeyError, TypeError, ValueError) as err:
             raise ValidationError(f"class {name!r} needs x, y, and z") from err
     return classes
