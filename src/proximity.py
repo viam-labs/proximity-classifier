@@ -4,7 +4,6 @@ from typing import ClassVar, Mapping, Optional, Sequence
 
 import numpy as np
 from typing_extensions import Self
-
 from viam.components.camera import Camera
 from viam.errors import NotSupportedError, ValidationError
 from viam.media.video import CameraMimeType, ViamImage

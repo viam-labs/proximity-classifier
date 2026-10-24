@@ -3,7 +3,6 @@ import pathlib
 
 import numpy as np
 import pytest
-
 from viam.components.camera import Camera
 from viam.errors import ValidationError
 from viam.proto.app.robot import ComponentConfig
