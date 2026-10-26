@@ -3,7 +3,6 @@ import pathlib
 
 import numpy as np
 import pytest
-
 from viam.components.camera import Camera
 from viam.errors import ValidationError
 from viam.proto.app.robot import ComponentConfig
@@ -57,9 +56,9 @@ def test_both_cups_classify():
 
 def test_empty_space_is_not_a_cup():
     found = asyncio.run(
-        classifier({"left-cup": LEFT, "right-cup": RIGHT, "nowhere": {"x": 0, "y": 0, "z": 20}}).get_classifications_from_camera(
-            "cup-camera", 5
-        )
+        classifier(
+            {"left-cup": LEFT, "right-cup": RIGHT, "nowhere": {"x": 0, "y": 0, "z": 20}}
+        ).get_classifications_from_camera("cup-camera", 5)
     )
     assert "nowhere" not in {item.class_name for item in found}
 
