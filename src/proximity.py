@@ -9,7 +9,7 @@ from viam.errors import NotSupportedError, ValidationError
 from viam.media.video import CameraMimeType, ViamImage
 from viam.proto.app.robot import ComponentConfig
 from viam.proto.common import PointCloudObject, ResourceName
-from viam.proto.service.vision import Classification, Detection, GetPropertiesResponse
+from viam.proto.service.vision import Classification, Detection, Detection3D, GetPropertiesResponse
 from viam.resource.base import ResourceBase
 from viam.resource.types import Model, ModelFamily
 from viam.services.vision import CaptureAllResult, Vision
@@ -117,6 +117,15 @@ class ProximityClassifier(Vision):
         extra: Optional[Mapping[str, ValueTypes]] = None,
         timeout: Optional[float] = None,
     ) -> list[Detection]:
+        raise NotSupportedError("proximity classifier does not detect")
+
+    async def get_detections_3d(
+        self,
+        camera_name: str,
+        *,
+        extra: Optional[Mapping[str, ValueTypes]] = None,
+        timeout: Optional[float] = None,
+    ) -> list[Detection3D]:
         raise NotSupportedError("proximity classifier does not detect")
 
     async def get_object_point_clouds(
